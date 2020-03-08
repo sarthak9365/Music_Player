@@ -28,8 +28,8 @@
             android:textColorLink="#00bfff"
             android:id="@+id/songtext"
             android:textAlignment="center"
-            android:textSize="24sp"
-            android:layout_marginTop="70dp"
+            android:textSize="@dimen/_24ssp"
+            android:layout_marginTop="@dimen/_70sdp"
             android:singleLine="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee"
@@ -52,28 +52,28 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_alignParentBottom="true"
-             android:layout_marginBottom="40dp" />
+             android:layout_marginBottom="@dimen/_40sdp" />
          <Button
-             android:layout_width="60dp"
-             android:layout_height="60dp"
+             android:layout_width="@dimen/_60sdp"
+             android:layout_height="@dimen/_60sdp"
              android:layout_centerHorizontal="true"
              android:background="@drawable/ic_pause"
              android:id="@+id/pause"
              android:layout_marginTop="5dp"/>
          <Button
-             android:layout_width="40dp"
-             android:layout_height="40dp"
+             android:layout_width="@dimen/_40sdp"
+             android:layout_height="@dimen/_40sdp"
              android:id="@+id/next"
              android:background="@drawable/ic_next"
              android:layout_toRightOf="@+id/pause"
-             android:layout_marginTop="15dp"
+             android:layout_marginTop="@dimen/_15sdp"
              />
          <Button
-             android:layout_width="40dp"
-             android:layout_height="40dp"
+             android:layout_width="@dimen/_40sdp"
+             android:layout_height="@dimen/_40sdp"
              android:id="@+id/previous"
              android:layout_toLeftOf="@+id/pause"
-             android:layout_marginTop="15dp"
+             android:layout_marginTop="@dimen/_15sdp"
              android:background="@drawable/ic_skip_previous_black_24dp"
              />
 
