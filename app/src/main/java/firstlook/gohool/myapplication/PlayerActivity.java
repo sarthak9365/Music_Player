@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 
 public class PlayerActivity extends AppCompatActivity {
 
-    Button btn_next,btn_previous,btn_pause;
+    Button btn_next, btn_previous, btn_pause;
     ImageView imageView;
     TextView songtext;
     SeekBar songseekBar;
@@ -28,35 +29,37 @@ public class PlayerActivity extends AppCompatActivity {
     String sname;
     ArrayList<File> mysongs;
     Thread updateseekBar;
+    //int seekLength;
+    boolean firstAttempt = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-       btn_next=(Button)findViewById(R.id.next);
-       btn_previous=(Button)findViewById(R.id.previous);
-        btn_pause=(Button)findViewById(R.id.pause);
-        songtext=(TextView)findViewById(R.id.songtext);
-        songseekBar=(SeekBar)findViewById(R.id.seekbaar);
-        imageView=(ImageView)findViewById(R.id.image);
+        btn_next = (Button) findViewById(R.id.next);
+        btn_previous = (Button) findViewById(R.id.previous);
+        btn_pause = (Button) findViewById(R.id.pause);
+        songtext = (TextView) findViewById(R.id.songtext);
+        songseekBar = (SeekBar) findViewById(R.id.seekbaar);
+        imageView = (ImageView) findViewById(R.id.image);
+        //initMediaPlayer();
 
         //getSupportActionBar().setTitle("Now Playing");
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        updateseekBar=new Thread(){
+        updateseekBar = new Thread() {
             @Override
             public void run() {
 
                 int totalduration = mediaPlayer.getDuration();
                 int currentposition = 0;
-                while(currentposition<totalduration){
+                while (currentposition < totalduration) {
                     try {
                         sleep(500);
-                        currentposition=mediaPlayer.getCurrentPosition();
+                        currentposition = mediaPlayer.getCurrentPosition();
                         songseekBar.setProgress(currentposition);
-                    }
-                    catch (InterruptedException e){
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
@@ -65,30 +68,30 @@ public class PlayerActivity extends AppCompatActivity {
 
             }
         };
-        if(mediaPlayer!=null){
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
         }
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        mysongs =(ArrayList)bundle.getParcelableArrayList("songs");
-        sname=mysongs.get(position).getName().toString();
+        mysongs = (ArrayList) bundle.getParcelableArrayList("songs");
+        sname = mysongs.get(position).getName().toString();
         String songname = intent.getStringExtra("songname");
         songtext.setText(songname);
         songtext.setSelected(true);
 
-        position = bundle.getInt("pos",0);
+        position = bundle.getInt("pos", 0);
 
-        Uri uri =Uri.parse(mysongs.get(position).toString());
+        Uri uri = Uri.parse(mysongs.get(position).toString());
 
-        mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
 
         mediaPlayer.start();
         songseekBar.setMax(mediaPlayer.getDuration());
         updateseekBar.start();
         songseekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-        songseekBar.getThumb().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_IN);
+        songseekBar.getThumb().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         songseekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -110,11 +113,10 @@ public class PlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 songseekBar.setMax(mediaPlayer.getDuration());
 
-                if(mediaPlayer.isPlaying()){
+                if (mediaPlayer.isPlaying()) {
                     btn_pause.setBackgroundResource(R.drawable.ic_play);
                     mediaPlayer.pause();
-                }
-                else{
+                } else {
                     btn_pause.setBackgroundResource(R.drawable.ic_pause);
                     mediaPlayer.start();
                 }
@@ -126,10 +128,10 @@ public class PlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mediaPlayer.stop();
                 mediaPlayer.release();
-                position = ((position+1)%mysongs.size());
+                position = ((position + 1) % mysongs.size());
                 Uri uri = Uri.parse(mysongs.get(position).toString());
 
-                mediaPlayer= MediaPlayer.create(getApplicationContext(),uri);
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 songtext.setText(mysongs.get(position).getName().toString());
                 mediaPlayer.start();
             }
@@ -139,29 +141,76 @@ public class PlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mediaPlayer.stop();
                 mediaPlayer.release();
-                position =((position-1)<0)?(mysongs.size()-1):(position-1);
+                position = ((position - 1) < 0) ? (mysongs.size() - 1) : (position - 1);
                 Uri uri = Uri.parse(mysongs.get(position).toString());
-                mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 songtext.setText(mysongs.get(position).getName().toString());
                 mediaPlayer.start();
 
             }
         });
 
+       // public boolean onOptionsItemSelected (MenuItem item){
 
+           // if (item.getItemId() == android.R.id.home) {
+            //    onBackPressed();
+            //}
+
+
+            //return super.onOptionsItemSelected(item);
+        //}
 
 
     }
-    public boolean onOptionsItemSelected(MenuItem item){
 
-        if(item.getItemId() == android.R.id.home){
-            onBackPressed();
+    /*void initMediaPlayer() {
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                try {
+
+                    if (firstAttempt) {
+                        firstAttempt = false;
+                    } else {
+                        nextSong();
+                        playSong();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+    void playSong(int i) throws Exception {
+        if(i != position){
+            int seekLength = 0;
         }
-
-
-        return super.onOptionsItemSelected(item);
+        position = i;
+        playSong();
     }
-
-
-
+    void playSong() throws Exception {
+        mediaPlayer.reset();
+        Uri uri = Uri.parse(mysongs.get(position).toString());
+        mediaPlayer.setDataSource(String.valueOf(uri));
+        mediaPlayer.prepare();
+        mediaPlayer.seekTo(seekLength);
+        mediaPlayer.start();
+    }
+    void nextSong() throws Exception {
+        position = position+1;
+        if (position == mysongs.size()){
+            position = 0;
+        }
+        seekLength = 0;
+        if(mediaPlayer.isPlaying()){
+            playSong();
+        }
+    }
+*/
 }
+
+
